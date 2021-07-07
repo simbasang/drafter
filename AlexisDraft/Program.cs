@@ -14,6 +14,7 @@ namespace AlexisDraft
 
         static void Main(string[] args)
         {
+            //ska vara dynamisk input
             var turns = 9;
             var ppl = 9;
             var filledTurns = new List<int[]>();
@@ -21,21 +22,47 @@ namespace AlexisDraft
             var posiblePositions = new List<int>();
             var exlude = new List<int>();
 
-            for (int i = 0; i < ppl; i++)
+
+            for (int i = 1; i < ppl + 1; i++)
             {
                 posiblePositions.Add(i);
+
             }
 
-            for (int i = 1; i < turns + 1; i++)
+            while (filledTurns.Any(x => x.Contains(0)) || !filledTurns.Any())
             {
-                var turnSheat = new int[ppl];
-                for (int j = 0; j < ppl; j++)
+
+                for (int i = 1; i < turns + 1; i++)
                 {
-                    turnSheat[j] = posiblePositions.Shuffle().FirstOrDefault(x => !turnSheat.Contains(x));
+                    var turnSheat = new int[ppl];
+
+                    for (int j = 0; j < ppl; j++)
+                    {
+                        //måste ta häjd för när det gått ett varv
+                        turnSheat[j] = posiblePositions.Shuffle().FirstOrDefault(x => !turnSheat.Contains(x) && !filledTurns.Select(x => x[j]).Contains(x));
+                    }
+
+
+
+                    filledTurns.Add(turnSheat);
+                }
+                if (filledTurns.Any(x => x.Contains(0)))
+                    filledTurns.Clear();
+
+            }
+            //ska exporteras till en csv fil 
+            for (int i = 0; i < ppl; i++)
+            {
+                var t = filledTurns.Select(x => x[i]);
+                var result = "";
+                foreach (var positoin in t)
+                {
+                    result += $"{positoin}, ";
+
                 }
 
-
-                filledTurns.Add(turnSheat);
+                Console.WriteLine($"person: {i} ");
+                Console.WriteLine($"Positions: {result}");
             }
 
         }
