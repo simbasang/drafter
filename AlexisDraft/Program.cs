@@ -14,11 +14,31 @@ namespace AlexisDraft
 
         static void Main(string[] args)
         {
-            //ska vara dynamisk input
-            var turns = 9;
-            var ppl = 9;
-            var filledTurns = new List<int[]>();
+            var turns = 0;
+            var ppl = 0;
 
+            while (true)
+            {
+
+                try
+                {
+                    Console.WriteLine("how many player?");
+                    ppl = int.Parse(Console.ReadLine());
+                    Console.WriteLine("how many turns?");
+                    turns = int.Parse(Console.ReadLine());
+
+                    break;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("not legit input only numbers");
+                }
+
+            }
+
+            var filledTurns = new List<int[]>();
+            var extra = turns % ppl;
+            var timesToRun = extra > 0 ? (turns / ppl) + 1 : turns / ppl;
             var posiblePositions = new List<int>();
             var exlude = new List<int>();
 
@@ -29,20 +49,25 @@ namespace AlexisDraft
 
             }
 
+
+
             while (filledTurns.Any(x => x.Contains(0)) || !filledTurns.Any())
             {
-
+                var counter = 1;
                 for (int i = 1; i < turns + 1; i++)
                 {
+
                     var turnSheat = new int[ppl];
 
                     for (int j = 0; j < ppl; j++)
                     {
-                        //måste ta häjd för när det gått ett varv
-                        turnSheat[j] = posiblePositions.Shuffle().FirstOrDefault(x => !turnSheat.Contains(x) && !filledTurns.Select(x => x[j]).Contains(x));
+                        turnSheat[j] = posiblePositions.Shuffle()
+                            .FirstOrDefault(x => !turnSheat.Contains(x)
+                                                 && filledTurns.Select(z => z[j]).Count(c => c == x) < counter);
                     }
 
-
+                    if (i % ppl == 0)
+                        counter++;
 
                     filledTurns.Add(turnSheat);
                 }
@@ -50,6 +75,8 @@ namespace AlexisDraft
                     filledTurns.Clear();
 
             }
+
+
             //ska exporteras till en csv fil 
             for (int i = 0; i < ppl; i++)
             {
